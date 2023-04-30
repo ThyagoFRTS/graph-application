@@ -1,7 +1,7 @@
 use gtk::prelude::*;
 use gtk::{glib, Application, ApplicationWindow};
 
-const APP_ID: &str = "org.gtk_rs.HelloWorld2";
+const APP_ID: &str = "git.ThyagoFRTS.GraphAPP";
 
 fn main() -> glib::ExitCode {
     // Create a new application
@@ -18,7 +18,7 @@ fn build_ui(app: &Application) {
     // Create a window and set the title
     let window = ApplicationWindow::builder()
         .application(app)
-        .title("My GTK App")
+        .title("Graph App")
         .build();
 
     // Present window
