@@ -1,23 +1,26 @@
-mod models;
-//mod graphy_search;
+use gtk::prelude::*;
+use gtk::{glib, Application, ApplicationWindow};
 
+const APP_ID: &str = "org.gtk_rs.HelloWorld2";
 
+fn main() -> glib::ExitCode {
+    // Create a new application
+    let app = Application::builder().application_id(APP_ID).build();
 
-fn main() {
-    // --snip--
-    //let file_path = "src/data/ordering.txt";
+    // Connect to "activate" signal of `app`
+    app.connect_activate(build_ui);
 
-    //let graph: Vec<Vec<i8>> = utils::read_graph(file_path);
-    //let path = graphy_search::deep_search(graph.clone());
-    //let path = graphy_search::topological_ordering(graph.clone());
-    //println!("{:?}", path);
-    //graphy_search::lenght_search(graph.clone(), 3);
-    //let (graph, graph_tyo) = utils::read_graph("src/data/input.txt");
-    
-    let mut g = models::graph::Graph::new();
-    g.load_from_file("src/data/input.txt");
-    g.print_graph();
-     
+    // Run the application
+    app.run()
+}
 
-    
+fn build_ui(app: &Application) {
+    // Create a window and set the title
+    let window = ApplicationWindow::builder()
+        .application(app)
+        .title("My GTK App")
+        .build();
+
+    // Present window
+    window.present();
 }
