@@ -27,6 +27,10 @@ impl Graph {
     pub fn get_graph(&self) ->  Vec<Vec<i8>> {
         self.graph.clone()
     }
+
+    pub fn get_vertex_list(&self) ->  Vec<usize> {
+        self.vertex_list.clone()
+    }
     
     pub fn load_from_file(&mut self, file_path: &str) {
         let file = File::open(file_path).unwrap();
