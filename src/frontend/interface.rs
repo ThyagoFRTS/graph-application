@@ -20,89 +20,45 @@ use gtk::{
     ResponseType
 };
 use crate::models::graph::Graph;
+use crate::frontend::components;
 
 pub fn build_ui(app: &Application) {
     let main_window = ApplicationWindow::new(app);
     main_window.set_title(Some("Graph App"));
     main_window.set_default_size(500, 500);
 
-    let horiozontal_line1 = Separator::builder()
-        .orientation(Orientation::Horizontal)
-        .height_request(2)
-        .margin_start(12)
-        .margin_end(12)
-        .build();
+    let line1 = components::build_separator();
+    let line2 = components::build_separator();
+    let line3 = components::build_separator();
+    let line4 = components::build_separator();
 
-    let horiozontal_line2 = Separator::builder()
-        .orientation(Orientation::Horizontal)
-        .height_request(2)
-        .margin_start(12)
-        .margin_end(12)
-        .build();
+    let path_file_label = components::build_label("Nenhum arquivo carregado");
 
-    let path_file_label = Label::builder()
-        .label("Nenhum arquivo carregado")
-        .margin_top(12)
-        .margin_bottom(12)
-        .margin_start(12)
-        .margin_end(12)
-        .build();
+    let load_file_button = components::build_button("Carregar arquivo");
 
-    let load_file_button = Button::builder()
-        .label("Carregar arquivo")
-        .margin_top(12)
-        .margin_bottom(12)
-        .margin_start(12)
-        .margin_end(12)
-        .build();
+    let verify_adjc_button = components::build_button("Verificar adjacência");
+    verify_adjc_button.set_sensitive(false);
 
-    let verify_adjc_button = Button::builder()
-        .label("Verificar adjacência")
-        .margin_top(12)
-        .margin_bottom(12)
-        .margin_start(12)
-        .margin_end(12)
-        .sensitive(false)
-        .build();
+    let verify_degree_button = components::build_button("Verificar grau");
+    verify_degree_button.set_sensitive(false);
 
-    let tree_detect_button = Button::builder()
-        .label("Detectar árvore")
-        .margin_top(12)
-        .margin_bottom(12)
-        .margin_start(12)
-        .margin_end(12)
-        .sensitive(false)
-        .build();
+    let tree_detect_button =components::build_button("Detectar árvore");
+    tree_detect_button.set_sensitive(false);
 
-    
+    let neighbors_button =components::build_button("Procurar Vizinhos");
+    neighbors_button.set_sensitive(false);
 
-    //let vertex_list1_dropdown = DropDown::new(Some(model), gtk::Expression::NONE);
-    let vertex_list1_dropdown = DropDown::builder()
-        //.expression(gtk::Expression::NONE)
-        .margin_top(12)
-        .margin_bottom(12)
-        .margin_start(12)
-        .margin_end(12)
-        .sensitive(false)
-        .build();
+    let vertex_list1_dropdown = components::build_dropdown();
+    vertex_list1_dropdown.set_sensitive(false);
 
-    let vertex_list2_dropdown = DropDown::builder()
-        //.expression(gtk::Expression::NONE)
-        .margin_top(12)
-        .margin_bottom(12)
-        .margin_start(12)
-        .margin_end(12)
-        .sensitive(false)
-        .build();
+    let vertex_list2_dropdown = components::build_dropdown();
+    vertex_list2_dropdown.set_sensitive(false);
 
-    let vertex_list3_dropdown = DropDown::builder()
-        //.expression(gtk::Expression::NONE)
-        .margin_top(12)
-        .margin_bottom(12)
-        .margin_start(12)
-        .margin_end(12)
-        .sensitive(false)
-        .build();
+    let vertex_list3_dropdown = components::build_dropdown();
+    vertex_list3_dropdown.set_sensitive(false);
+
+    let vertex_list4_dropdown = components::build_dropdown();
+    vertex_list4_dropdown.set_sensitive(false);
 
     let output_frame = Frame::builder()
         .label("")
@@ -117,18 +73,32 @@ pub fn build_ui(app: &Application) {
     buttons_layout.append(&load_file_button);
     buttons_layout.append(&tree_detect_button);
 
+    let degree_layout = Box::new(Orientation::Horizontal,0);
+    degree_layout.set_halign(Align::Center);
+    degree_layout.append(&vertex_list3_dropdown);
+    degree_layout.append(&verify_degree_button);
+
     let vertex_layout = Box::new(Orientation::Horizontal, 0);
     vertex_layout.set_halign(Align::Center);
     vertex_layout.append(&vertex_list1_dropdown);
     vertex_layout.append(&vertex_list2_dropdown);
     vertex_layout.append(&verify_adjc_button);
-    //vertex_layout.append(&tree_detect_button);
+    
+    let neighbors_layout = Box::new(Orientation::Horizontal, 0);
+    neighbors_layout.set_halign(Align::Center);
+    neighbors_layout.append(&vertex_list4_dropdown);
+    neighbors_layout.append(&neighbors_button);
 
     let main_layout = Box::new(Orientation::Vertical, 0);
     main_layout.append(&buttons_layout);
     main_layout.append(&path_file_label);
+    main_layout.append(&line1);
+    main_layout.append(&degree_layout);
+    main_layout.append(&line2);
+    main_layout.append(&neighbors_layout);
+    main_layout.append(&line3);
     main_layout.append(&vertex_layout);
-    main_layout.append(&horiozontal_line1);
+    main_layout.append(&line4);
     //main_layout.append(&horiozontal_line);
     main_layout.append(&output_frame);
 
@@ -165,13 +135,78 @@ pub fn build_ui(app: &Application) {
             result_window.show();
     }));
 
-    load_file_button.connect_clicked(clone!(
-        @weak main_window, 
+    verify_degree_button.connect_clicked( clone!( 
+        @weak main_window,
         @weak path_file_label,
-        @weak tree_detect_button,
-        @weak verify_adjc_button,
-        @weak vertex_list1_dropdown,
-        @weak vertex_list2_dropdown
+        @weak vertex_list3_dropdown
+         => move |_button| {
+            let source = vertex_list3_dropdown.selected();
+
+            let mut g = Graph::new();
+            g.load_from_file(path_file_label.text().as_str());
+            
+            let result = g.verify_vertex_degree(source.try_into().unwrap());
+
+            //let message = if result {"São adjacentes"} else {"Não são adjacentes"};
+
+            let result_window = MessageDialog::new(
+                Some(&main_window),
+                DialogFlags::empty(),
+                gtk::MessageType::Info,
+                gtk::ButtonsType::Ok,
+                result
+            );
+
+            result_window.connect_response(|dialog_window, response| {
+                if response == ResponseType::Ok {
+                    dialog_window.destroy();
+                }
+                dialog_window.destroy();
+            });
+
+            result_window.show();
+    }));
+
+    neighbors_button.connect_clicked( clone!( 
+        @weak main_window,
+        @weak path_file_label,
+        @weak vertex_list4_dropdown
+         => move |_button| {
+            let source = vertex_list4_dropdown.selected();
+
+            let mut g = Graph::new();
+            g.load_from_file(path_file_label.text().as_str());
+            
+            let neighbors = g.get_neighbors_from(source.try_into().unwrap());
+
+            let result = neighbors.iter()
+            .map(|x| format!("v{}", x))
+            .collect::<Vec<String>>()
+            .join(",");
+
+            //let message = if result {"São adjacentes"} else {"Não são adjacentes"};
+
+            let result_window = MessageDialog::new(
+                Some(&main_window),
+                DialogFlags::empty(),
+                gtk::MessageType::Info,
+                gtk::ButtonsType::Ok,
+                result
+            );
+
+            result_window.connect_response(|dialog_window, response| {
+                if response == ResponseType::Ok {
+                    dialog_window.destroy();
+                }
+                dialog_window.destroy();
+            });
+
+            result_window.show();
+    }));
+
+
+    load_file_button.connect_clicked(clone!(
+        @weak main_window
           => move |_button| {
         let file_explorer = FileChooserDialog::new(
             Some("Selecione o arquivo de texto"),
@@ -190,9 +225,12 @@ pub fn build_ui(app: &Application) {
         file_explorer.connect_response(clone!(
             @weak path_file_label,
             @weak verify_adjc_button,
+            @weak neighbors_button,
+            @weak verify_degree_button,
             @weak vertex_list1_dropdown,
             @weak vertex_list2_dropdown,
             @weak vertex_list3_dropdown,
+            @weak vertex_list4_dropdown,
             @weak tree_detect_button => move |file_explorer, response| {
             if response == ResponseType::Ok {
                 if let Some(file) = file_explorer.file() {
@@ -218,12 +256,17 @@ pub fn build_ui(app: &Application) {
                         vertex_list2_dropdown.set_model(Some(&model1));
                         vertex_list2_dropdown.set_expression(Expression::NONE);
                         vertex_list2_dropdown.set_sensitive(true);
-                        //vertex_list3_dropdown.set_model(Some(&model1));
-                        //vertex_list3_dropdown.set_expression(Expression::NONE);
-                        //vertex_list3_dropdown.set_sensitive(true);
+                        vertex_list3_dropdown.set_model(Some(&model1));
+                        vertex_list3_dropdown.set_expression(Expression::NONE);
+                        vertex_list3_dropdown.set_sensitive(true);
+                        vertex_list4_dropdown.set_model(Some(&model1));
+                        vertex_list4_dropdown.set_expression(Expression::NONE);
+                        vertex_list4_dropdown.set_sensitive(true);
                         g.print_graph();
                         tree_detect_button.set_sensitive(true);
                         verify_adjc_button.set_sensitive(true);
+                        verify_degree_button.set_sensitive(true);
+                        neighbors_button.set_sensitive(true);
                     }
                 }
             }

@@ -4,7 +4,6 @@ use std::io::{BufRead, BufReader};
 
 pub struct Graph {
     is_digraph: bool,
-    initialized: bool,
     vertex_list: Vec<usize>,
     graph: Vec<Vec<i8>>,
 }
@@ -15,7 +14,6 @@ impl Graph {
             vertex_list: Vec::new(),
             graph: Vec::new(),
             is_digraph: false,
-            initialized: false,
         }
     }
 
@@ -81,5 +79,45 @@ impl Graph {
     pub fn is_adjacent(&self,source: usize, destiny: usize) -> bool{
         if self.graph[source][destiny] == 1 { true } else { false }
     }
+
+    pub fn verify_vertex_degree(&self, vertex: usize) -> String {
+        if self.is_digraph {
+            let mut total_in = 0;
+            let mut total_out = 0;
+
+            for element in self.graph[vertex].clone().into_iter() {
+                total_out = total_out + element as i32;
+            }
+
+            for line in self.graph.clone().into_iter() {
+                total_in = total_in + line[vertex] as i32;
+            }
+
+            let output = format!("Grau de saída: {} Grau de entrada: {}",total_out,total_in);
+            return output;
+
+        } else {
+            let mut total = 0;
+            for element in self.graph[vertex].clone().into_iter() {
+                total = total + element as i32;
+            }
+
+            let output = format!("Grau do vétice: {}", total);
+            return output;
+        }
+    }
+
+    pub fn get_neighbors_from(&self, vertex: usize) -> Vec<usize> {
+        let mut neighbors:Vec<usize> = Vec::new();
+        for (i, &val) in self.graph[vertex].clone().iter().enumerate() {
+            if val == 1 {
+                neighbors.push(i);
+            }
+        }
+        neighbors
+    }
+
+
+
     
 }
