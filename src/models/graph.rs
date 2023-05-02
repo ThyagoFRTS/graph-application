@@ -4,6 +4,7 @@ use std::io::{BufRead, BufReader};
 
 pub struct Graph {
     is_digraph: bool,
+    initialized: bool,
     vertex_list: Vec<usize>,
     graph: Vec<Vec<i8>>,
 }
@@ -14,6 +15,7 @@ impl Graph {
             vertex_list: Vec::new(),
             graph: Vec::new(),
             is_digraph: false,
+            initialized: false,
         }
     }
 
@@ -64,7 +66,7 @@ impl Graph {
         let total_vertex =  self.vertex_list.len();
         
         self.graph = vec![vec![0; total_vertex]; total_vertex];
-        println!("{:?}",graph_type);
+        //println!("{:?}",graph_type);
     
         for edge_pair in edge_list {
             self.graph[edge_pair.0][edge_pair.1] = 1;
@@ -76,5 +78,8 @@ impl Graph {
 
     }
 
+    pub fn is_adjacent(&self,source: usize, destiny: usize) -> bool{
+        if self.graph[source][destiny] == 1 { true } else { false }
+    }
     
 }
