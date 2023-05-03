@@ -8,18 +8,14 @@ use gtk::{
     FileChooserAction,
     Box,
     Align,
-    Button,
     FileFilter,
     Orientation, 
-    Label,
     Frame,
-    DropDown,
     StringList,
-    Expression,
-    Separator, 
+    Expression, 
     ResponseType
 };
-use crate::models::graph::Graph;
+use crate::models::graph::Representation;
 use crate::frontend::components;
 
 pub fn build_ui(app: &Application) {
@@ -111,7 +107,7 @@ pub fn build_ui(app: &Application) {
             let source = vertex_list1_dropdown.selected();
             let destiny = vertex_list2_dropdown.selected();
 
-            let mut g = Graph::new();
+            let mut g = Representation::new();
             g.load_from_file(path_file_label.text().as_str());
             let result = g.is_adjacent(source.try_into().unwrap(), destiny.try_into().unwrap());
 
@@ -142,7 +138,7 @@ pub fn build_ui(app: &Application) {
          => move |_button| {
             let source = vertex_list3_dropdown.selected();
 
-            let mut g = Graph::new();
+            let mut g = Representation::new();
             g.load_from_file(path_file_label.text().as_str());
             
             let result = g.verify_vertex_degree(source.try_into().unwrap());
@@ -174,7 +170,7 @@ pub fn build_ui(app: &Application) {
          => move |_button| {
             let source = vertex_list4_dropdown.selected();
 
-            let mut g = Graph::new();
+            let mut g = Representation::new();
             g.load_from_file(path_file_label.text().as_str());
             
             let neighbors = g.get_neighbors_from(source.try_into().unwrap());
@@ -236,7 +232,7 @@ pub fn build_ui(app: &Application) {
                 if let Some(file) = file_explorer.file() {
                     if let Some(path) = file.path() {
                         //println!("Caminho do arquivo selecionado: {:?}", path.as_os_str());
-                        let mut g = Graph::new();
+                        let mut g = Representation::new();
 
                         let path = path.as_os_str().to_str().unwrap();
                         g.load_from_file(path);

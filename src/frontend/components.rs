@@ -1,5 +1,3 @@
-use gtk::glib::clone;
-use gtk::{prelude::*, MessageDialog, DialogFlags};
 use gtk::{
     Button,
     Orientation, 

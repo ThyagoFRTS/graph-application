@@ -1,19 +1,24 @@
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
+use crate::remove_letters;
+use crate::utils::create_mapper;
 
-pub struct Graph {
+
+pub struct Representation {
     is_digraph: bool,
     vertex_list: Vec<usize>,
+    labels_list: Vec<usize>,
     graph: Vec<Vec<i8>>,
 }
 
-impl Graph {
+impl Representation {
     pub fn new() -> Self {
         Self {
             vertex_list: Vec::new(),
             graph: Vec::new(),
             is_digraph: false,
+            labels_list: Vec::new(),
         }
     }
 
@@ -36,45 +41,72 @@ impl Graph {
         let file = File::open(file_path).unwrap();
         let reader: BufReader<File> = BufReader::new(file);
         self.vertex_list = Vec::new();
-        let mut edge_list: Vec<(usize, usize)> = Vec::new();
+        let mut edge_label_list: Vec<(usize, usize)> = Vec::new();
     
         let mut lines = Vec::new();
         for line in reader.lines() {
             let line = line.unwrap();
             lines.push(line);
         }
-    
-        let graph_type = lines[0].clone();
+        
+        //let graph_type = lines[0].clone();
+        self.is_digraph = if lines[0].clone().eq("D") { true } else { false };
+
         lines.remove(0);
         
         for line in lines {
-            let processed_line = line.replace("v", "");
+            let processed_line = remove_letters(&line);
             let edge: Vec<usize>  = processed_line.split(",")
+                //.map(|element| element.to_string().parse::<usize>().unwrap())
                 .map(|element| element.to_string().parse::<usize>().unwrap())
                 .collect();
-                edge_list.push((edge[0],edge[1]));
+            edge_label_list.push((edge[0],edge[1]));
+            self.labels_list.push(edge[0]);
+            self.labels_list.push(edge[1]);
+        }
             
-            self.vertex_list.append(&mut edge.clone());
-            
+        self.labels_list.sort();
+        self.labels_list.dedup();
+        
+
+        let total_vertex =  self.labels_list.len();
+        
+
+        self.vertex_list = Vec::with_capacity(total_vertex);
+        for i in 0..total_vertex {
+            self.vertex_list.push(i);
         }
 
-        self.vertex_list.sort();
-        self.vertex_list.dedup();
-    
-        let total_vertex =  self.vertex_list.len();
+        
+        println!("{:?}",self.labels_list.clone());
+        println!("{:?}",self.vertex_list.clone());
+
+        
+        
+
+        let vertex_mapper = create_mapper(self.labels_list.clone());
         
         self.graph = vec![vec![0; total_vertex]; total_vertex];
-        //println!("{:?}",graph_type);
-    
-        for edge_pair in edge_list {
-            self.graph[edge_pair.0][edge_pair.1] = 1;
-        }
+        //println!("{:?}",graph_type );
         
+        if self.is_digraph {
+            for edge_pair in edge_label_list {
+                let source = vertex_mapper(edge_pair.0).unwrap();
+                let destiny = vertex_mapper(edge_pair.1).unwrap();
+                self.graph[source][destiny] = 1;
+            }
+        } else {
+            for edge_pair in edge_label_list {
+                let source = vertex_mapper(edge_pair.0).unwrap();
+                let destiny = vertex_mapper(edge_pair.1).unwrap();
+                self.graph[source][destiny] = 1;
+                self.graph[destiny][source] = 1;
+            }
+        }
 
-
-        self.is_digraph = if graph_type.eq("D") { true } else { false };
 
     }
+
 
     pub fn is_adjacent(&self,source: usize, destiny: usize) -> bool{
         if self.graph[source][destiny] == 1 { true } else { false }
