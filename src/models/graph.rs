@@ -1,9 +1,8 @@
 use std::fs::File;
-use std::io::{BufRead, BufReader};
+use std::io::{BufRead, BufReader };
 
-use crate::remove_letters;
-use crate::utils::create_mapper;
 
+use crate::utils::{create_mapper, create_file, remove_letters};
 
 pub struct Representation {
     is_digraph: bool,
@@ -25,8 +24,7 @@ impl Representation {
     pub fn print_graph(&self) {
         for vertex_adjacency in &self.graph {
             println!("{:?}",vertex_adjacency);
-        }
-        
+        } 
     }
 
     pub fn get_graph(&self) ->  Vec<Vec<i8>> {
@@ -48,7 +46,6 @@ impl Representation {
             let line = line.unwrap();
             lines.push(line);
         }
-        
         //let graph_type = lines[0].clone();
         self.is_digraph = if lines[0].clone().eq("D") { true } else { false };
 
@@ -68,26 +65,16 @@ impl Representation {
         self.labels_list.sort();
         self.labels_list.dedup();
         
-
         let total_vertex =  self.labels_list.len();
         
-
         self.vertex_list = Vec::with_capacity(total_vertex);
         for i in 0..total_vertex {
             self.vertex_list.push(i);
         }
 
-        
-        println!("{:?}",self.labels_list.clone());
-        println!("{:?}",self.vertex_list.clone());
-
-        
-        
-
         let vertex_mapper = create_mapper(self.labels_list.clone());
         
         self.graph = vec![vec![0; total_vertex]; total_vertex];
-        //println!("{:?}",graph_type );
         
         if self.is_digraph {
             for edge_pair in edge_label_list {
@@ -103,8 +90,6 @@ impl Representation {
                 self.graph[destiny][source] = 1;
             }
         }
-
-
     }
 
 
@@ -149,7 +134,44 @@ impl Representation {
         neighbors
     }
 
+    pub fn export_graphviz_file(&self){
+        let g_type = if self.is_digraph {"digraph "} else {"graph "};
 
+        let mut temp_graph = self.get_graph();
 
-    
+        let mut edges:Vec<(usize,usize)> = Vec::new();
+
+        for i in 0..temp_graph.len() {
+            for j in 0..temp_graph[i].len() {
+                if temp_graph[i][j] == 1 {
+                    edges.push((i,j));
+                    // eu sei que dava pra colocar esse if fora do laço, de modo a fazer
+                    // só uma comparação ao invés de NxN
+                    // mas fica muito feio kkk
+                    if !self.is_digraph {
+                        temp_graph[j][i] = 0;
+                    }
+                }
+            }
+        }
+        let separator = if self.is_digraph { "->" } else {  "--" };
+
+        let mut corpus = String::new();
+
+        for edge in edges.into_iter() {
+            let line = String::from(format!("\t{} {} {}\n",edge.0.to_string(),separator, edge.1.to_string()));
+            corpus.push_str(line.as_str());
+        }
+
+        let content = String::from(
+            format!(
+                "{} {{\n{} }}",
+                g_type,
+                corpus
+            )
+        );
+        println!("{:?}", content);
+        create_file(content);
+
+    }
 }
