@@ -15,6 +15,7 @@ use gtk::{
     Expression, 
     ResponseType
 };
+use crate::cmd::use_graphviz;
 use crate::models::graph::Representation;
 use crate::frontend::components;
 
@@ -40,6 +41,9 @@ pub fn build_ui(app: &Application) {
 
     let tree_detect_button =components::build_button("Detectar árvore");
     tree_detect_button.set_sensitive(false);
+
+    let export_png_button =components::build_button("Exportar svg");
+    export_png_button.set_sensitive(false);
 
     let neighbors_button =components::build_button("Procurar Vizinhos");
     neighbors_button.set_sensitive(false);
@@ -67,6 +71,7 @@ pub fn build_ui(app: &Application) {
     let buttons_layout = Box::new(Orientation::Horizontal, 0);
     buttons_layout.set_halign(Align::Center);
     buttons_layout.append(&load_file_button);
+    buttons_layout.append(&export_png_button);
     buttons_layout.append(&tree_detect_button);
 
     let degree_layout = Box::new(Orientation::Horizontal,0);
@@ -95,7 +100,6 @@ pub fn build_ui(app: &Application) {
     main_layout.append(&line3);
     main_layout.append(&vertex_layout);
     main_layout.append(&line4);
-    //main_layout.append(&horiozontal_line);
     main_layout.append(&output_frame);
 
     verify_adjc_button.connect_clicked( clone!( 
@@ -200,6 +204,41 @@ pub fn build_ui(app: &Application) {
             result_window.show();
     }));
 
+    export_png_button.connect_clicked(clone!(
+        @weak main_window,
+        @weak path_file_label
+        => move |_| {
+            let mut g = Representation::new();
+            g.load_from_file(path_file_label.text().as_str());
+            g.export_graphviz_file();
+
+            let mut result = String::new();
+
+
+            match use_graphviz::export_svg("graphviz.dot") {
+                Ok(()) => result.push_str("Arquivo exportado em: ./graphviz.svg"),
+                Err(e) => result.push_str(e.to_string().as_str()),
+            }
+
+            let result_window = MessageDialog::new(
+                Some(&main_window),
+                DialogFlags::empty(),
+                gtk::MessageType::Info,
+                gtk::ButtonsType::Ok,
+                result
+            );
+
+            result_window.connect_response(|dialog_window, response| {
+                if response == ResponseType::Ok {
+                    dialog_window.destroy();
+                }
+                dialog_window.destroy();
+            });
+
+            result_window.show();
+        }
+    ));
+
 
     load_file_button.connect_clicked(clone!(
         @weak main_window
@@ -223,6 +262,7 @@ pub fn build_ui(app: &Application) {
             @weak verify_adjc_button,
             @weak neighbors_button,
             @weak verify_degree_button,
+            @weak export_png_button,
             @weak vertex_list1_dropdown,
             @weak vertex_list2_dropdown,
             @weak vertex_list3_dropdown,
@@ -263,6 +303,7 @@ pub fn build_ui(app: &Application) {
                         verify_adjc_button.set_sensitive(true);
                         verify_degree_button.set_sensitive(true);
                         neighbors_button.set_sensitive(true);
+                        export_png_button.set_sensitive(true);
                     }
                 }
             }

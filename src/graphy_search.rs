@@ -1,15 +1,4 @@
 
-
-fn get_neighbors(arr: &mut Vec<i8>) -> Vec<usize>{
-    let mut indexes: Vec<usize> = Vec::new();
-    for (i, &val) in arr.iter().enumerate() {
-        if val == 1 {
-            indexes.push(i);
-        }
-    }
-    indexes
-}
-
 fn deep_search_in(vertex: usize, stack: &mut Vec<bool>, graph_line:  &mut Vec<Vec<i8>>, path: &mut Vec<(usize, usize)>,pos_ordering: bool){
     stack[vertex] = true;
     let neighbors = get_neighbors(&mut graph_line[vertex]);
@@ -62,8 +51,7 @@ pub fn lenght_search(graph: Vec<Vec<i8>>, vertex: usize){
         let u = stack[0];
         stack.remove(0);
         let neighbors = get_neighbors(&mut graph[u]);
-        //println!("{:?}",neighbors);
-        
+  
         for neighbor in neighbors {
             if visited_vertex[neighbor] == false {
                 visited_vertex[neighbor] = true;
@@ -73,7 +61,6 @@ pub fn lenght_search(graph: Vec<Vec<i8>>, vertex: usize){
                 
             }
         }
-        //println!("------",);
     }
 
 }
