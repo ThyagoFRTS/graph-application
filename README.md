@@ -2,11 +2,11 @@
 This application was made to study the Rust language and also for the discipline of algorithm design
 
 <div align="center">
-  <img src="./app_images/not_loaded.png" alt="login" width="400" height="428" style="margin: 5px;">
+  <img src="./app_images/not_loaded.png" alt="login" width="500" height="435" style="margin: 5px;">
 </div>
 <div align="center">
-  <img src="./app_images/loaded.png" alt="void home" width="350" height="375" style="margin: 5px;">
-  <img src="./app_images/tree.png" alt="home page" width="350" height="375" style="margin: 5px;">
+  <img src="./app_images/loaded.png" alt="void home" width="390" height="418" style="margin: 5px;">
+  <img src="./app_images/tree.png" alt="home page" width="390" height="418" style="margin: 5px;">
 </div>
 
 ## Functionalities
@@ -17,6 +17,26 @@ This application was made to study the Rust language and also for the discipline
 - Display selected node degree
 - Export .dot file to feed graphviz framework
 - Export svg graph from .dot file
+
+## Setup Dependencies
+Make sure to download graphviz binaries and put on root directory, this is the more important dependency to plot graph.
+The especific version used was [8.0.3](https://gitlab.com/api/v4/projects/4207231/packages/generic/graphviz-releases/8.0.3/windows_10_msbuild_Release_graphviz-8.0.3-win32.zip)
+
+- Download Graphviz binaries from [official page](https://graphviz.org/download/)
+- Paste zip file content in program root directory
+The three folder will be like this:
+<pre>
+├── /.fingerprint
+├── /build
+├── /deps
+├── /examples
+└── /Graphviz
+    └── /bin
+        └── some_files.some_extension
+├── /incremental
+├── graph_project.exe
+└── some_files.some_extension
+</pre>
 
 # How to load your graph file
 Fist, your graph need to stay in txt file in respective format:
@@ -47,24 +67,6 @@ A3,A1
 - [gtk4](https://gtk-rs.org/gtk4-rs/stable/latest/book/installation.html)
 - [Graphviz](https://graphviz.org/)
 
-## Setup
-Make sure to download graphviz binaries and put on root directory.
-- Download Graphviz binaries from [official page](https://graphviz.org/download/)
-The especific version used was [8.0.3](https://gitlab.com/api/v4/projects/4207231/packages/generic/graphviz-releases/8.0.3/windows_10_msbuild_Release_graphviz-8.0.3-win32.zip)
-- Paste zip file content in program root directory
-The three folder will be like this:
-<pre>
-├── /.fingerprint
-├── /build
-├── /deps
-├── /examples
-└── /Graphviz
-    └── /bin
-        └── some_files.some_extension
-├── /incremental
-├── graph_project.exe
-└── some_files.some_extension
-</pre>
 
 ## Build Configs
 ### gtk
