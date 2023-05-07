@@ -1,16 +1,13 @@
-use gtk::gdk_pixbuf::{Pixbuf, PixbufLoader};
-use gtk::prelude::PixbufLoaderExt;
 use gtk::{
     Button,
     Orientation, 
     Label,
     DropDown,
-    Separator,
-    Picture
+    Separator, 
+    PolicyType,
+    Frame, 
+    ScrolledWindow
 };
-use std::path::Path;
-
-use crate::utils::verify_file_exist;
 
 pub fn build_separator() -> Separator {
     Separator::builder()
@@ -21,6 +18,34 @@ pub fn build_separator() -> Separator {
         .build()
 }
 
+pub fn build_vseparator() -> Separator {
+    Separator::builder()
+        .orientation(Orientation::Vertical)
+        .height_request(2)
+        .margin_start(12)
+        .margin_end(12)
+        .build()
+}
+
+pub fn build_frame () -> Frame {
+    Frame::builder()
+        .margin_top(12)
+        .margin_bottom(12)
+        .margin_start(12)
+        .margin_end(12)
+        .hexpand(true)
+        .build()
+}
+
+pub fn build_scrollwindow(title: &str) -> ScrolledWindow {
+    ScrolledWindow::builder()
+        .margin_start(12)
+        .margin_end(12)
+        .vscrollbar_policy(PolicyType::Automatic)
+        .build()
+}
+
+
 pub fn build_label(title: &str) -> Label {
     Label::builder()
         .label(title)
@@ -28,6 +53,14 @@ pub fn build_label(title: &str) -> Label {
         .margin_bottom(12)
         .margin_start(12)
         .margin_end(12)
+        .build()
+}
+
+pub fn build_clean_label(title: &str) -> Label {
+    Label::builder()
+        .label(title)
+        .margin_top(8)
+        .margin_bottom(8)
         .build()
 }
 

@@ -133,6 +133,9 @@ impl Representation {
         }
         neighbors
     }
+     pub fn get_graph_type (&self) -> bool {
+        return self.is_digraph.clone()
+     }
 
     pub fn export_graphviz_file(&self){
         let g_type = if self.is_digraph {"digraph "} else {"graph "};

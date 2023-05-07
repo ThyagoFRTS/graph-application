@@ -1,5 +1,5 @@
 use gtk::glib::clone;
-use gtk::{prelude::*, MessageDialog, DialogFlags};
+use gtk::prelude::*;
 use gtk::{
     glib,
     Application,
@@ -10,12 +10,10 @@ use gtk::{
     Align,
     FileFilter,
     Orientation, 
-    Frame,
-    StringList,
-    Expression, 
+    ScrolledWindow,
+    PolicyType,
     ResponseType
 };
-use crate::cmd::use_graphviz;
 use crate::controllers::handlers::*;
 use crate::models::graph::Representation;
 use crate::frontend::components;
@@ -29,6 +27,7 @@ pub fn build_ui(app: &Application) {
     let line2 = components::build_separator();
     let line3 = components::build_separator();
     let line4 = components::build_separator();
+    let vline1 = components::build_vseparator();
 
     let path_file_label = components::build_label("Nenhum arquivo carregado");
 
@@ -40,13 +39,16 @@ pub fn build_ui(app: &Application) {
     let verify_degree_button = components::build_button("Verificar grau");
     verify_degree_button.set_sensitive(false);
 
-    let tree_detect_button =components::build_button("Detectar árvore");
+    let tree_detect_button = components::build_button("Detectar árvore");
     tree_detect_button.set_sensitive(false);
 
-    let export_png_button =components::build_button("Exportar svg");
+    let edges_button = components::build_button("Visitar arestas");
+    edges_button.set_sensitive(false);
+
+    let export_png_button = components::build_button("Exportar svg");
     export_png_button.set_sensitive(false);
 
-    let neighbors_button =components::build_button("Procurar Vizinhos");
+    let neighbors_button = components::build_button("Procurar Vizinhos");
     neighbors_button.set_sensitive(false);
 
     let vertex_list1_dropdown = components::build_dropdown();
@@ -61,46 +63,53 @@ pub fn build_ui(app: &Application) {
     let vertex_list4_dropdown = components::build_dropdown();
     vertex_list4_dropdown.set_sensitive(false);
 
-    let output_frame = Frame::builder()
-        .label("")
-        .margin_top(12)
-        .margin_bottom(12)
-        .margin_start(12)
-        .margin_end(12)
-        .build();
+    let output_label = components::build_clean_label(" ");
+    output_label.set_wrap(true);
+    output_label.set_wrap_mode(gtk::pango::WrapMode::Word);
+     
+    let scolled_window = components::build_scrollwindow(" ");
+    scolled_window.set_child(Some(&output_label));
+
+    let output_frame = components::build_frame();
+
+    output_frame.set_child(Some(&scolled_window));
+    output_frame.set_vexpand(true);
 
     let buttons_layout = Box::new(Orientation::Horizontal, 0);
     buttons_layout.set_halign(Align::Center);
     buttons_layout.append(&load_file_button);
     buttons_layout.append(&export_png_button);
-    buttons_layout.append(&tree_detect_button);
 
-    let degree_layout = Box::new(Orientation::Horizontal,0);
-    degree_layout.set_halign(Align::Center);
-    degree_layout.append(&vertex_list3_dropdown);
-    degree_layout.append(&verify_degree_button);
+    let neighborhood_layout = Box::new(Orientation::Horizontal,0);
+    neighborhood_layout.set_halign(Align::Center);
+    neighborhood_layout.append(&vertex_list3_dropdown);
+    neighborhood_layout.append(&verify_degree_button);
+    neighborhood_layout.append(&vline1);
+    neighborhood_layout.append(&vertex_list4_dropdown);
+    neighborhood_layout.append(&neighbors_button);
 
-    let vertex_layout = Box::new(Orientation::Horizontal, 0);
-    vertex_layout.set_halign(Align::Center);
-    vertex_layout.append(&vertex_list1_dropdown);
-    vertex_layout.append(&vertex_list2_dropdown);
-    vertex_layout.append(&verify_adjc_button);
+    let adjacency_layout = Box::new(Orientation::Horizontal, 0);
+    adjacency_layout.set_halign(Align::Center);
+    adjacency_layout.append(&vertex_list1_dropdown);
+    adjacency_layout.append(&vertex_list2_dropdown);
+    adjacency_layout.append(&verify_adjc_button);
     
-    let neighbors_layout = Box::new(Orientation::Horizontal, 0);
-    neighbors_layout.set_halign(Align::Center);
-    neighbors_layout.append(&vertex_list4_dropdown);
-    neighbors_layout.append(&neighbors_button);
+    let tree_egdes_layout = Box::new(Orientation::Horizontal, 0);
+    tree_egdes_layout.set_halign(Align::Center);
+    tree_egdes_layout.append(&tree_detect_button);
+    tree_egdes_layout.append(&edges_button);
 
     let main_layout = Box::new(Orientation::Vertical, 0);
     main_layout.append(&buttons_layout);
     main_layout.append(&path_file_label);
     main_layout.append(&line1);
-    main_layout.append(&degree_layout);
+    main_layout.append(&neighborhood_layout);
     main_layout.append(&line2);
-    main_layout.append(&neighbors_layout);
+    main_layout.append(&tree_egdes_layout);
     main_layout.append(&line3);
-    main_layout.append(&vertex_layout);
+    main_layout.append(&adjacency_layout);
     main_layout.append(&line4);
+    //main_layout.append(&scolled_window);
     main_layout.append(&output_frame);
 
     verify_adjc_button.connect_clicked( clone!( 
@@ -136,6 +145,20 @@ pub fn build_ui(app: &Application) {
         }
     ));
 
+    tree_detect_button.connect_clicked( clone!( 
+        @weak path_file_label,
+        @weak output_label
+         => move |_button| {
+            handle_tree_detection(&path_file_label, &output_label);
+    }));
+
+    edges_button.connect_clicked(clone!(
+        @weak path_file_label,
+        @weak output_label
+        => move |_button| {
+            handle_visit_edges(&path_file_label, &output_label);
+        }
+    ));
 
     load_file_button.connect_clicked(clone!(
         @weak main_window
@@ -159,6 +182,7 @@ pub fn build_ui(app: &Application) {
             @weak verify_adjc_button,
             @weak neighbors_button,
             @weak verify_degree_button,
+            @weak edges_button,
             @weak export_png_button,
             @weak vertex_list1_dropdown,
             @weak vertex_list2_dropdown,
@@ -179,6 +203,7 @@ pub fn build_ui(app: &Application) {
                             &verify_adjc_button,
                             &neighbors_button,
                             &verify_degree_button,
+                            &edges_button,
                             &export_png_button,
                             &tree_detect_button,
                             &vertex_list1_dropdown,

@@ -1,16 +1,14 @@
 pub mod frontend;
 pub mod models;
 pub mod utils;
+pub mod graphy_search;
 pub mod controllers;
 pub mod cmd;
-use std::io;
 use gtk::prelude::*;
-use gtk::{glib, Application};
-use models::graph::Representation;
+use gtk::Application;
+
 
 use crate::frontend::interface::build_ui;
-
-use std::process::Command;
 
 
 const APP_ID: &str = "git.ThyagoFRTS.GraphAPP";
