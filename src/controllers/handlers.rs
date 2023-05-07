@@ -1,4 +1,4 @@
-use gtk::traits::{WidgetExt, DialogExt, GtkWindowExt, FrameExt};
+use gtk::traits::{WidgetExt, DialogExt, GtkWindowExt};
 use gtk::{
     Button,
     Label,
@@ -8,11 +8,10 @@ use gtk::{
     ApplicationWindow, 
     ResponseType, 
     DialogFlags, 
-    MessageDialog, Frame
+    MessageDialog
 };
 
 use crate::cmd::use_graphviz;
-use crate::frontend::components::build_label;
 use crate::graphy_search::{deep_search, visit_all_edges};
 use crate::models::graph::Representation;
 

@@ -10,8 +10,6 @@ use gtk::{
     Align,
     FileFilter,
     Orientation, 
-    ScrolledWindow,
-    PolicyType,
     ResponseType
 };
 use crate::controllers::handlers::*;
@@ -67,7 +65,7 @@ pub fn build_ui(app: &Application) {
     output_label.set_wrap(true);
     output_label.set_wrap_mode(gtk::pango::WrapMode::Word);
      
-    let scolled_window = components::build_scrollwindow(" ");
+    let scolled_window = components::build_scrollwindow();
     scolled_window.set_child(Some(&output_label));
 
     let output_frame = components::build_frame();

@@ -37,7 +37,7 @@ pub fn build_frame () -> Frame {
         .build()
 }
 
-pub fn build_scrollwindow(title: &str) -> ScrolledWindow {
+pub fn build_scrollwindow() -> ScrolledWindow {
     ScrolledWindow::builder()
         .margin_start(12)
         .margin_end(12)
