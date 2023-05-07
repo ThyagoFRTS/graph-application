@@ -3,9 +3,9 @@ use std::process::Command;
 use std::path::Path;
 //Graphviz\bin\dot -Tsvg graphviz.dot -o output.svg
 pub fn export_svg(file_path: &str) -> Result<(), Error>{
-    let mut rs:bool=true;
-    rs = Path::new(file_path).exists();
-    if rs {
+    let mut has_file:bool=true;
+    has_file = Path::new(file_path).exists();
+    if has_file {
         let output = Command::new("cmd")
         .args(["/C", "Graphviz\\bin\\dot","-Tsvg",file_path,"-o","output.svg"])
         .output()

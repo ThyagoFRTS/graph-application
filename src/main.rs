@@ -1,6 +1,7 @@
 pub mod frontend;
 pub mod models;
 pub mod utils;
+pub mod controllers;
 pub mod cmd;
 use std::io;
 use gtk::prelude::*;

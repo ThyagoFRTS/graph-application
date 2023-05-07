@@ -16,6 +16,7 @@ use gtk::{
     ResponseType
 };
 use crate::cmd::use_graphviz;
+use crate::controllers::handlers::*;
 use crate::models::graph::Representation;
 use crate::frontend::components;
 
@@ -108,31 +109,7 @@ pub fn build_ui(app: &Application) {
         @weak vertex_list1_dropdown,
         @weak vertex_list2_dropdown
          => move |_button| {
-            let source = vertex_list1_dropdown.selected();
-            let destiny = vertex_list2_dropdown.selected();
-
-            let mut g = Representation::new();
-            g.load_from_file(path_file_label.text().as_str());
-            let result = g.is_adjacent(source.try_into().unwrap(), destiny.try_into().unwrap());
-
-            let message = if result {"São adjacentes"} else {"Não são adjacentes"};
-
-            let result_window = MessageDialog::new(
-                Some(&main_window),
-                DialogFlags::empty(),
-                gtk::MessageType::Info,
-                gtk::ButtonsType::Ok,
-                message
-            );
-
-            result_window.connect_response(|dialog_window, response| {
-                if response == ResponseType::Ok {
-                    dialog_window.destroy();
-                }
-                dialog_window.destroy();
-            });
-
-            result_window.show();
+            handle_vertex_adjacency(&main_window, &path_file_label, &vertex_list1_dropdown, &vertex_list2_dropdown);
     }));
 
     verify_degree_button.connect_clicked( clone!( 
@@ -140,31 +117,7 @@ pub fn build_ui(app: &Application) {
         @weak path_file_label,
         @weak vertex_list3_dropdown
          => move |_button| {
-            let source = vertex_list3_dropdown.selected();
-
-            let mut g = Representation::new();
-            g.load_from_file(path_file_label.text().as_str());
-            
-            let result = g.verify_vertex_degree(source.try_into().unwrap());
-
-            //let message = if result {"São adjacentes"} else {"Não são adjacentes"};
-
-            let result_window = MessageDialog::new(
-                Some(&main_window),
-                DialogFlags::empty(),
-                gtk::MessageType::Info,
-                gtk::ButtonsType::Ok,
-                result
-            );
-
-            result_window.connect_response(|dialog_window, response| {
-                if response == ResponseType::Ok {
-                    dialog_window.destroy();
-                }
-                dialog_window.destroy();
-            });
-
-            result_window.show();
+            handle_vertex_degree(&main_window, &path_file_label, &vertex_list3_dropdown);
     }));
 
     neighbors_button.connect_clicked( clone!( 
@@ -172,70 +125,14 @@ pub fn build_ui(app: &Application) {
         @weak path_file_label,
         @weak vertex_list4_dropdown
          => move |_button| {
-            let source = vertex_list4_dropdown.selected();
-
-            let mut g = Representation::new();
-            g.load_from_file(path_file_label.text().as_str());
-            
-            let neighbors = g.get_neighbors_from(source.try_into().unwrap());
-
-            let result = neighbors.iter()
-            .map(|x| format!("v{}", x))
-            .collect::<Vec<String>>()
-            .join(",");
-
-            //let message = if result {"São adjacentes"} else {"Não são adjacentes"};
-
-            let result_window = MessageDialog::new(
-                Some(&main_window),
-                DialogFlags::empty(),
-                gtk::MessageType::Info,
-                gtk::ButtonsType::Ok,
-                result
-            );
-
-            result_window.connect_response(|dialog_window, response| {
-                if response == ResponseType::Ok {
-                    dialog_window.destroy();
-                }
-                dialog_window.destroy();
-            });
-
-            result_window.show();
+            handle_vertex_neighbors(&main_window, &path_file_label, &vertex_list4_dropdown);
     }));
 
     export_png_button.connect_clicked(clone!(
         @weak main_window,
         @weak path_file_label
         => move |_| {
-            let mut g = Representation::new();
-            g.load_from_file(path_file_label.text().as_str());
-            g.export_graphviz_file();
-
-            let mut result = String::new();
-
-
-            match use_graphviz::export_svg("graphviz.dot") {
-                Ok(()) => result.push_str("Arquivo exportado em: ./graphviz.svg"),
-                Err(e) => result.push_str(e.to_string().as_str()),
-            }
-
-            let result_window = MessageDialog::new(
-                Some(&main_window),
-                DialogFlags::empty(),
-                gtk::MessageType::Info,
-                gtk::ButtonsType::Ok,
-                result
-            );
-
-            result_window.connect_response(|dialog_window, response| {
-                if response == ResponseType::Ok {
-                    dialog_window.destroy();
-                }
-                dialog_window.destroy();
-            });
-
-            result_window.show();
+            handle_export_svg(&main_window, &path_file_label);
         }
     ));
 
@@ -271,39 +168,24 @@ pub fn build_ui(app: &Application) {
             if response == ResponseType::Ok {
                 if let Some(file) = file_explorer.file() {
                     if let Some(path) = file.path() {
-                        //println!("Caminho do arquivo selecionado: {:?}", path.as_os_str());
                         let mut g = Representation::new();
-
                         let path = path.as_os_str().to_str().unwrap();
                         g.load_from_file(path);
-                        //.iter().map(|&x| format!("v{}", x)).collect();
+
                         path_file_label.set_text(path);
 
-                        let model1 = StringList::new(&[]);
-
-                        for vertex in g.get_vertex_list(){
-                            let opt = &("v".to_owned() +vertex.to_string().as_str());
-                            model1.append(opt);
-                        }
-
-                        vertex_list1_dropdown.set_model(Some(&model1));
-                        vertex_list1_dropdown.set_expression(Expression::NONE);
-                        vertex_list1_dropdown.set_sensitive(true);
-                        vertex_list2_dropdown.set_model(Some(&model1));
-                        vertex_list2_dropdown.set_expression(Expression::NONE);
-                        vertex_list2_dropdown.set_sensitive(true);
-                        vertex_list3_dropdown.set_model(Some(&model1));
-                        vertex_list3_dropdown.set_expression(Expression::NONE);
-                        vertex_list3_dropdown.set_sensitive(true);
-                        vertex_list4_dropdown.set_model(Some(&model1));
-                        vertex_list4_dropdown.set_expression(Expression::NONE);
-                        vertex_list4_dropdown.set_sensitive(true);
-                        g.print_graph();
-                        tree_detect_button.set_sensitive(true);
-                        verify_adjc_button.set_sensitive(true);
-                        verify_degree_button.set_sensitive(true);
-                        neighbors_button.set_sensitive(true);
-                        export_png_button.set_sensitive(true);
+                        setup_ui_components(
+                            &g, 
+                            &verify_adjc_button,
+                            &neighbors_button,
+                            &verify_degree_button,
+                            &export_png_button,
+                            &tree_detect_button,
+                            &vertex_list1_dropdown,
+                            &vertex_list2_dropdown,
+                            &vertex_list3_dropdown,
+                            &vertex_list4_dropdown
+                        );
                     }
                 }
             }

@@ -1,10 +1,16 @@
+use gtk::gdk_pixbuf::{Pixbuf, PixbufLoader};
+use gtk::prelude::PixbufLoaderExt;
 use gtk::{
     Button,
     Orientation, 
     Label,
     DropDown,
-    Separator
+    Separator,
+    Picture
 };
+use std::path::Path;
+
+use crate::utils::verify_file_exist;
 
 pub fn build_separator() -> Separator {
     Separator::builder()
@@ -43,3 +49,20 @@ pub fn build_dropdown() -> DropDown {
         .margin_end(12)
         .build()
 }
+
+/* 
+pub fn build_svg_image(path:: Path) -> Picture{
+
+    let content_bytes = include_bytes!(path);
+    let loader = PixbufLoader::new();
+
+    loader.write(content_bytes).unwrap();
+    loader.close().unwrap();
+
+    let pixbuf = loader.pixbuf().unwrap();
+
+    let picture = Picture::new();
+    picture.set_pixbuf(Some(&pixbuf));
+    picture
+}
+*/
