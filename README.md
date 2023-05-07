@@ -2,9 +2,11 @@
 This application was made to study the Rust language and also for the discipline of algorithm design
 
 <div align="center">
-  <img src="./app_images/not_loaded.png.png" alt="login" width="249" height="266" style="margin: 5px;">
-  <img src="./app_images/loaded.png.png" alt="void home" width="249" height="266" style="margin: 5px;">
-  <img src="./app_images/tree.png" alt="home page" width="249" height="266" style="margin: 5px;">
+  <img src="./app_images/not_loaded.png" alt="login" width="400" height="428" style="margin: 5px;">
+</div>
+<div align="center">
+  <img src="./app_images/loaded.png" alt="void home" width="350" height="375" style="margin: 5px;">
+  <img src="./app_images/tree.png" alt="home page" width="350" height="375" style="margin: 5px;">
 </div>
 
 ## Functionalities
