@@ -168,7 +168,7 @@ impl Representation {
 
         let content = String::from(
             format!(
-                "{} {{\n{} }}",
+                "{} exported_graph {{\n\trankdir=LR;\n\tsize=\"6,5\";\n\tnode [shape = circle];\n{}}}",
                 g_type,
                 corpus
             )
