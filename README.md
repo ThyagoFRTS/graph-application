@@ -9,7 +9,7 @@ This application was made to study the Rust language and also for the discipline
   <img src="./app_images/tree.png" alt="home page" width="390" height="418" style="margin: 5px;">
 </div>
 
-## Functionalities
+## Features
 - Tree detection
 - Display adjacency between two nodes
 - Get all neighbors from selected nodes
@@ -17,6 +17,8 @@ This application was made to study the Rust language and also for the discipline
 - Display selected node degree
 - Export .dot file to feed graphviz framework
 - Export svg graph from .dot file
+
+Obs: Graph input not persists in memory, every click interations load txt file and free itself memory after close function call (as rust feature), except by load button that save nodes info.
 
 ## Setup Dependencies
 Make sure to download graphviz binaries and put on root directory, this is the more important dependency to plot graph.
