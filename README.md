@@ -24,6 +24,7 @@ The especific version used was [8.0.3](https://gitlab.com/api/v4/projects/420723
 
 - Download Graphviz binaries from [official page](https://graphviz.org/download/)
 - Paste zip file content in program root directory
+
 The three folder will be like this:
 <pre>
 ├── /.fingerprint
@@ -70,4 +71,4 @@ A3,A1
 
 ## Build Configs
 ### gtk
-Maybe you need change gtk from crates.io to compatible verion of your gtk local instalation
+Maybe you need change gtk from crates.io to compatible version of your gtk local instalation
